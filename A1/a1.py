@@ -27,18 +27,16 @@ for i in range(len(full_input)-1):
         new_grid = False
         dimensions = full_input[i]
         dimension_total = i + dimensions[0]
-        # print(dimensions)
+        grid_to_add = [dimensions, []]
     
     elif not new_grid and i < dimension_total:
-        # print(i)
-        continue
+        grid_to_add[1] += [full_input[i]]
 
     else:
         new_grid = True
-        # print(i)
+        grid_to_add[1] += [full_input[i]]
+        grids += [grid_to_add]
         continue
-
-
 
 # Reminder: [Row no./ Height] [Length]   //  [height,length]
 
@@ -65,6 +63,9 @@ class GridGraph:
             return self.dv
 
         def set_dv(self, dv):
+            # Debugging
+            # print('THE DV', self.location, dv)
+
             self.dv = dv
 
         def get_location(self):
@@ -98,64 +99,101 @@ class GridGraph:
 
 
 
-my_graph = GridGraph([2,2],[[0,1],[2,3]])
-# my_graph = GridGraph([3,3],[[0,6,2],[1,8,4],[2,3,7]])
-# print(my_graph.get_nodes())
-
-
-# Dijkstra’s Algorithm (G, l)
-
-# Let S be the set of explored nodes
-# For each u ∈ S, we store a distance d(u) Initially S={s} and d(s)=0
-# While S̸=V
-# Select a node v ̸∈ S with at least one edge from S for which d′(v) = mine=(u , v):u∈S d(u) + le is as small as possible
-# Add v to S and define d(v)=d′(v) EndWhile
-
-
-
 def dijkstra_algorithm (graph):
     explored_nodes = [] # Stores location array not object
+    committed_nodes = []
     
     start = [graph.get_dimensions()[0]-1, 0] # Start = [Max, 0]
     graph.node(start).set_dv(graph.node(start).get_weight())
     final = [0, graph.get_dimensions()[1]-1] # Final = [0, Max]
     explored_nodes += [start]
 
-    unexplored_nodes = []
 
-    current_node = graph.node(explored_nodes[0])
-    for node_location in current_node.get_connections():
-        unexplored_nodes += [[node_location, current_node.get_location()]]
+    # while final not in explored_nodes:
+    while not explored_nodes == []:
+        unexplored_nodes = []
 
-    print(unexplored_nodes)
+        for i in range(len(explored_nodes)):
+            if explored_nodes[i] not in committed_nodes:
+                current_node = graph.node(explored_nodes[i])
+                for node_location in current_node.get_connections():
+                    # print('XXX - CURRENT NODE CONNECTIONS ======', node_location)
+                    if node_location not in committed_nodes:
+                        unexplored_nodes += [[node_location, current_node.get_location()]]
 
-    for i in range(len(unexplored_nodes)):
-        current_node_a = graph.node(unexplored_nodes[i][0])
-        current_node_b = graph.node(unexplored_nodes[i][1])
-        test_dv = current_node_a.get_weight() + current_node_b.get_weight()
-        if (current_node_a.get_dv() == -1) or (current_node_a.get_dv() > test_dv):
-            current_node_a.set_dv(test_dv)
+        # print('UNEXPLORED NODES', unexplored_nodes)
+        
+        # print('PRECOMMIT', committed_nodes)
+        committed_nodes += explored_nodes
+        # print('COMMIT', committed_nodes)
+        # print(final not in explored_nodes)
+        explored_nodes = [] # Empty the explored nodes
 
-    print(graph.node(start).get_weight())
-    print(explored_nodes)
+        for j in range(len(unexplored_nodes)-1,-1,-1):
+            current_node_a = graph.node(unexplored_nodes[j][0])
+            current_node_b = graph.node(unexplored_nodes[j][1]) #this is the one connected with it
+            test_dv = current_node_a.get_weight() + current_node_b.get_dv()
+            # print('PRE-DV', current_node_a.get_location(), current_node_b.get_location(), test_dv, '===', current_node_a.get_weight(), current_node_b.get_dv())
+            # print('moment-of-truth', current_node_a.get_weight(), current_node_b.get_dv())
+            if (current_node_a.get_dv() == -1) or (current_node_a.get_dv() > test_dv):
+                current_node_a.set_dv(test_dv)
+
+            explored_nodes += [unexplored_nodes[j][0]]
+
+
+    # print(graph.node(start).get_weight())
+    # print(explored_nodes)
 
     # Change to return!
     print(graph.node(final).get_dv())
 
     # while graph.get_node_count() < len(explored_nodes):
 
-dijkstra_algorithm(my_graph)
+
+
+
+# Test Cases
+
+# my_graph = GridGraph([2,2],[[0,1],[2,3]])
+# my_graph = GridGraph([3,3],[[0,6,2],[1,8,4],[2,3,7]])
+# my_graph = GridGraph( [3,5],[[1,3,9,9,1],[5,10,1,8,4],[2,7,8,2,6]])
+# print(my_graph.get_nodes())
+
+# dijkstra_algorithm(my_graph)
+
+
+# For final implementation need to use stdio for what gets returned above!!
+
+for grid in grids:
+    dijkstra_algorithm(GridGraph(grid[0],grid[1]))
 
 
 
 
 
+# [
+#     [[0, 0], [1, 0]],   # -> 3 + 0 = 3
+# [[0, 1], [1, 0]], 
+# [[2, 0], [1, 0]], 
+#     [[0, 0], [1, 1]],   # -> 10 + 0 = 10
+# [[0, 1], [1, 1]], 
+# [[0, 2], [1, 1]], 
+# [[1, 2], [1, 1]], 
+# [[2, 0], [1, 1]], 
+# [[2, 2], [1, 1]], 
+# [[1, 2], [2, 1]], 
+# [[2, 0], [2, 1]], 
+# [[2, 2], [2, 1]]]
 
+# COMMIT [[2, 0], [1, 0], [1, 1], [2, 1]]
 
-
-
-
-
+# THE DV [0, 0] 1
+# THE DV [0, 1] 7
+# THE DV [0, 2] 10
+# THE DV [1, 2] 12
+# THE DV [2, 2] 15
+# THE DV [1, 2] 7
+# THE DV [2, 2] 10
 
 
 
