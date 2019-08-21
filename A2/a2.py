@@ -1,6 +1,7 @@
 import sys
 from math import ceil
 import time
+start = time.time()
 
 class XNode:
     def __init__(self, x, y):
@@ -33,7 +34,7 @@ def squared_euclidean_distance(coordinate1, coordinate2):
 def main():
     # Preprocessing step in O(nlogn)
     p_x_orig = []
-    p_y_orig = []
+    # p_y_orig = []
 
     # Stores the index values
     p_x = []
@@ -44,27 +45,30 @@ def main():
     for line in sys.stdin:
         array = ([int(x) for x in line.split()])
         p_x_orig += [array]
-        p_y_orig += [array]
+        # p_y_orig += [array]
         p_x += [length]
         p_y += [length]
         length += 1
 
     p_x_orig.sort(key= lambda k: k[0])
-    p_y_orig.sort(key= lambda k: k[1])
+    # p_y_orig.sort(key= lambda k: k[1])
 
     # print(p_x_orig, p_y_orig, p_x, p_y)
 
-    brute_start = time.time()
-    a = brute(p_x_orig, p_x)
-    brute_end = time.time()
+    # brute_start = time.time()
+    # a = brute(p_x_orig, p_x)
+    # brute_end = time.time()
 
-    print('Brute Force Answer =', a, 'time =', brute_end - brute_start)
+    # print('Brute Force Answer =', a, 'time =', brute_end - brute_start)
 
-    dc_start = time.time()
-    b = closest_pair(p_x_orig, p_y_orig, p_x, p_y, length)
-    dc_end = time.time()
+    # dc_start = time.time()
+    b = closest_pair(p_x_orig, p_x, p_y, length)
+    # dc_end = time.time()
     
-    print('DC Answer =', b, 'time =', dc_end - dc_start)
+    # print('DC Answer =', b, 'time =', dc_end - dc_start)
+
+    end = time.time()
+    print(b, 'time =', end - start)
 
     # for i in range(len(p_x)):
     #     node = heappop(p_x)
@@ -75,6 +79,7 @@ def main():
 
 
 def brute(p_x_orig, p_x):
+    # print('pxo', len(p_x_orig), 'px', len(p_x))
     p1 = p_x_orig[p_x[0]]
     p2 = p_x_orig[p_x[1]]
     delta = squared_euclidean_distance(p1, p2)
@@ -120,8 +125,9 @@ def brute_seven(p_x_orig, p_x):
     return delta
 
 
-def closest_pair(p_x_orig, p_y_orig, p_x, p_y, length):
+def closest_pair(p_x_orig, p_x, p_y, length):
 
+    length = len(p_x)
     # Note can revise - len() in python is O(1) -> doesn't 'count' each time
     # Keeping the length saved might reduce 'some' time though
     # print('length =', length, len(p_x))
@@ -137,45 +143,22 @@ def closest_pair(p_x_orig, p_y_orig, p_x, p_y, length):
     # The middle node = l_median - 1
     median = ceil(length / 2)
     # print(p_x_orig[p_x[median]][0])
-
-    try:
-        l_median = p_x_orig[p_x[median]][0]
-    except:
-        print(p_x, 'median', median, 'length', length, len(p_x))
-        return 0
-
-    # add to U and V
-    # save as index to avoid stack overflow
-    # u_x = p_x[:l_median]
-    # u_y = []
-    # v_x = p_x [l_median:]
-    # v_y = []
-
-    u_x, u_y, v_x, v_y = [], [], [], []
-
-
-    # This can be sped up by splitting x
-    # p_x[:l_median] and p_x [l_median:]
-
-    for i in range(length):
-        if p_x_orig[p_x[i]][0] < l_median:
-            u_x += [p_x[i]]
-        else:
-            v_x += [p_x[i]]
-
-        if p_y_orig[p_y[i]][0] < l_median:
-            u_y += [p_y[i]]
-        else:
-            v_y += [p_y[i]]
-
     
 
-    # print(u_x, v_x, u_y, v_y)
+    u_x = p_x[:median]
+    u_y = []
+    v_x = p_x [median:]
+    v_y = []
 
 
-    delta_1 = closest_pair(p_x_orig, p_y_orig, u_x, u_y, median)
-    delta_2 = closest_pair(p_x_orig, p_y_orig, v_x, v_y, length - median)
+    # print('Delta 1 Begins!', u_x)
+    delta_1 = closest_pair(p_x_orig, u_x, u_y, median)
+    delta_2 = closest_pair(p_x_orig, v_x, v_y, length - median)
     delta = min(delta_1, delta_2)
+
+    # Shortcut function seeing as this is the minimum distance
+    if delta == 0:
+        return delta
 
     # Get the points within the 2 * delta strip
 
@@ -205,9 +188,11 @@ def closest_pair(p_x_orig, p_y_orig, p_x, p_y, length):
     
     s_y.sort(key= lambda k: k[1])  #Note this is ~ nlogn time, might need improvement
 
-    return min(delta, brute_seven(p_x_orig, s_y))
+    # print('s_y', s_y)
 
-
+    my_variable = min(delta, brute_seven(p_x_orig, s_y))
+    # print(my_variable)
+    return my_variable
 
 
 main()
