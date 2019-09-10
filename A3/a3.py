@@ -1,4 +1,5 @@
 import sys
+from heapq import heappush, heappop, merge
 
 def main():
     firstLine = True
@@ -80,7 +81,56 @@ def problem1(array):
 
 
 def problem2(array):
-    return None
+    schedule = []
+    heap = []
+
+    # First Case
+    sn, fn = array[0][0], array[0][1]
+    schedule += [fn]
+
+    for i in range(1, len(array)):
+        sn, fn = array[i][0], array[i][1]
+
+        # j = 0
+
+        # try:
+        #     while True:
+        #         fsmall = heappop(schedule)
+
+        #         if sn > fsmall:
+        #             heappush(heap, fn)
+
+        #         else:
+        #             heappush(heap, fsmall)
+
+
+
+        #         schedule = heap
+        #         heap = []
+
+        # # There is no compatible class room
+        # # heappop([]) throws IndexError
+        # except IndexError:
+
+        # This works as comparisions only need to be
+        # made on smallest fn due to properties of
+        # being sorted by sn
+
+        fsmall = heappop(schedule)
+        if sn > fsmall:
+            heappush(schedule, fn)
+        else:
+            heappush(schedule, fn)
+            heappush(schedule, fsmall)
+
+    print(len(schedule))
+
+
+
+
+            
+
+
 
 
 def problem3(array):
