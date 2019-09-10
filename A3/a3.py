@@ -45,18 +45,42 @@ def main():
 
         # This means it's at the end of the line
         except IndexError:
-            # Last needs to be added
+            # Last item needs to be added (no ' ' at end)
             array += [[int(sn), int(fn)]]
+            # print(array)
 
-            print(array)
+            # Sort the algorithms n log n time
             start_first = sorted(array, key=lambda x: x[0])
             end_first = sorted(array, key=lambda x: x[1])
             print(start_first)
-            print(end_first)
+            # print(end_first)
+
+            # Solve the three problems
+            print('Problem 1:')
+            problem1(end_first)
+
+            print('Problem 2:')
+            problem2(start_first)
 
             print('Problem 3:')
             problem3(start_first)
             print()
+
+
+def problem1(array):
+    schedule = []
+
+    for i in range(len(array)):
+        sn, fn = array[i][0], array[i][1]
+
+        if schedule == [] or sn > schedule[len(schedule) - 1]:
+            schedule += [fn]
+
+    print(len(schedule))
+
+
+def problem2(array):
+    return None
 
 
 def problem3(array):
@@ -64,6 +88,7 @@ def problem3(array):
     new_union = True
     union = 0
 
+    # Can be coded better
     for i in range(len(array)):
         sn, fn = array[i][0], array[i][1]
         if new_union:
@@ -84,7 +109,7 @@ def problem3(array):
             if union > max_union:
                 max_union = union
 
-        print(i, '-', sn, fn, su, fu, union)
+        # print(i, '-', sn, fn, su, fu, union)
 
     print(max_union)
 
