@@ -1,5 +1,5 @@
 import sys
-from heapq import heappush, heappop, merge
+from heapq import heappush, heappop
 
 def main():
     firstLine = True
@@ -18,6 +18,7 @@ def main():
         # print(array)
         
         # Manually processing the input for time efficiency
+        # Very case specific - e.g. errors on empty lines
         array = []
         i = 0
         try:
