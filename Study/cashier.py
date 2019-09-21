@@ -2,7 +2,11 @@ def main():
     print("Enter Amount in dollars $ (0 to exit)")
 
     try:
-        amount = int(float(input()) * 100)
+        # Without rounding
+        # amount = int(float(input()) * 100)
+
+        # With rounding
+        amount = round(float(input())*10)*10
 
         if amount == 0:
             return False
@@ -12,7 +16,7 @@ def main():
         if type(change) == list:
             change = [(lambda x: x/100)(i) for i in cashier(amount)]
 
-        print(change)
+        print(amount/100, change)
 
     except ValueError:
         print("Invalid input")
@@ -20,7 +24,9 @@ def main():
     return True
 
 
+# Takes amount (as cents / integer) as input
 def cashier(amount):
+    # NZ Denominations
     denominations = [10,20,50,100,200,500,1000,2000,5000,10000]
     change = []
 
@@ -43,6 +49,8 @@ def cashier(amount):
         change = "No Exact Change"
 
     return change
+
+
 
 run = True
 while run:
