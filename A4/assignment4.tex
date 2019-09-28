@@ -1,0 +1,197 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{fullpage}
+\usepackage[top=2cm, bottom=4.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{lastpage}
+\usepackage{enumerate}
+\usepackage{fancyhdr}
+\usepackage{mathrsfs}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\hypersetup{%
+	colorlinks=true,
+	linkcolor=blue,
+	linkbordercolor={0 0 1}
+}
+
+\renewcommand\lstlistingname{Algorithm}
+\renewcommand\lstlistlistingname{Algorithms}
+\def\lstlistingautorefname{Alg.}
+
+\lstdefinestyle{Python}{
+	language        = Python,
+	frame           = lines, 
+	basicstyle      = \footnotesize,
+	keywordstyle    = \color{blue},
+	stringstyle     = \color{green},
+	commentstyle    = \color{red}\ttfamily
+}
+
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.05in}
+
+% Edit these as appropriate
+\newcommand\course{CS 320}
+\newcommand\hwnumber{4}                  % <-- homework number
+\newcommand\NetIDa{Edwards, Ryan}           % <-- NetID of person #1
+\newcommand\NetIDb{399067099}           % <-- NetID of person #2 (Comment this line out for problem sets)
+
+\pagestyle{fancyplain}
+\headheight 35pt
+\lhead{\NetIDa}
+\lhead{\NetIDa\\\NetIDb}                 % <-- Comment this line out for problem sets (make sure you are person #1)
+\chead{\textbf{\Large Assignment \hwnumber}}
+\rhead{\course \\ \today}
+\lfoot{}
+\cfoot{}
+\rfoot{\small\thepage}
+\headsep 1.5em
+
+\begin{document}
+	\section*{Theoretical questions}
+
+	
+	\begin{enumerate}
+		\item 
+		Illustrate that if a new email from the address $a \in A$, it always gets through (1 pts).
+		
+		\begin{proof}
+		Consider the email address: redw764@aucklanduni.ac.nz
+		
+		In binary, this is equivalent to:
+		
+		01110010 01100101 01100100 01110111 00110111 00110110 00110100 01000000 01100001 01110101 01100011 01101011 01101100 01100001 01101110 01100100 01110101 01101110 01101001 00101110 01100001 01100011 00101110 01101110 01111010
+		
+		Let this be represented as an integer $x$ such that $x \in A$
+		
+		When the hash table is constructed, the function will set $B[h(x)] = 1$
+		
+		When an email is received, the email filter will apply the hash function $h(x)$
+		
+		By definition:
+		\begin{itemize}
+			\item 
+			If $B[h(x)] = 1$ the email will go through
+			\item 
+			If $B[h(x)] = 0$ the email is considered spam
+		\end{itemize}
+		
+		Because $B[h(x)] = 1$ was set when the hash table was constructed, and because a hash function will always return the same output for $h(x)$, the lookup function will return $1$ and the email will go through.
+		
+	\end{proof}
+		
+		\item
+		Given any position $0 \leq i < n$, what is the probability that $B[i] = 1$ (2 pts).
+		
+		As there is a universal hashing function for integers
+		
+		$$ h_{ab}(x) = ((ax + b) \mod p) \mod n $$
+		
+		As $n = 8,000,000,000$ the probability of a collision is $Pr_h[h(x)=h(y)] \leq \frac{1}{n} \leq \frac{1}{8\text{B}}$
+		
+		Therefore, the probability of $B[i] = 0$ after $1$ insert is $\geq 1 - \frac{1}{8\text{B}}$
+		
+		The probability of $B[i] = 0$ after $1\text{B}$ inserts is $\geq (1 - \frac{1}{8\text{B}})^{1\text{B}}$		
+		
+		Thus, the the probability that $B[i] = 1$ is simply
+		
+		$$\leq 1 - (1 - \frac{1}{8\text{B}})^{1\text{B}} \lessapprox 0.11750 $$
+		
+		\item 
+		Given a spam email from the address $a' \notin A$, what is the probability that it gets through (2 pts)
+		
+		As, by definition, a universal hashing function will uniformly distribute a new hashed value, the probability of collision is the probability that $B[i] = 1$.
+		
+		Thus, the probability of $B[h(a')] = 1$ is $\lessapprox 0.11750$
+		
+		\pagebreak
+		
+		\section*{Practical implementation}
+		
+		\begin{lstlisting}[style = Python]	
+	import random
+
+        def main(): 
+            # Initial Values
+            n = 8000000
+            p = 8024047 # prime number > n
+
+            # Initalise an empty Hash Table
+            hash_table = [0] * n
+
+            # 0 <= a, b < p
+            a = random.randrange(0, p)
+            b = random.randrange(0, p)
+            
+            # Create the email address list
+            total_addresses = 1000000
+            email_address_list = [i for i in range(1, total_addresses + 1)]
+            
+            for address in email_address_list:
+                hash_table[universal_hash(a, b, n, p, address)] = 1 
+
+
+        ### Question one ###
+            try:
+                for number in email_address_list:
+                    hash_value = universal_hash(a , b, n, p, number)
+                    
+                    if hash_table[hash_value] == 0:
+                        raise SpamDetected
+
+            except SpamDetected:
+                print("Spam test failed")
+
+            else:
+                print("Spam test passed")
+
+        ### Question two ###
+            # Based on formula in theoretical question 2
+            theoretical_probability = 1 - (1 - 1/n) ** total_addresses
+
+            print("Theoretical Probability =", theoretical_probability)
+            
+        \end{lstlisting}
+        \pagebreak
+        \begin{lstlisting}[style = Python]	
+        ### Question three ###
+            spam_email_count = 0
+            spam_email_no = 1000
+            
+            for i in range(spam_email_no):
+                random_address = random.randrange(total_addresses + 1, 9999999)
+                hash_value = universal_hash(a, b, n, p, random_address)
+                if hash_table[hash_value] == 1:
+                    spam_email_count += 1
+
+            print("Simulated Probability =", spam_email_count / spam_email_no)
+            print("No. Unblocked Spam =", spam_email_count)
+            print()
+
+
+        # Hashing function based on universal hash family for integer
+        def universal_hash(a, b, n,  p, x):
+            return ((a * x + b) % p) % n
+
+        class Error(Exception):
+           """Base class for other exceptions"""
+           pass
+        class SpamDetected(Error):
+           """Spam has been detected"""
+           pass
+
+        main()
+		
+		\end{lstlisting}
+		
+		Sample Output:
+		
+		\includegraphics[width=0.65\linewidth]{output.png}
+		
+		
+	\end{enumerate}
+	
+\end{document}
