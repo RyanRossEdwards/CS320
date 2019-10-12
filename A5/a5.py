@@ -53,7 +53,7 @@ def maxSum(array, dp1, dp2):
 
     for i in range(3, len(array)):
 
-        for j in range(0, i-1):
+        for j in range(1, i-1):
 
             if dp2[i] < dp2[j] + array[i]:
                 dp2[i] = dp2[j] + array[i]
