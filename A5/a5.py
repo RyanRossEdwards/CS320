@@ -11,9 +11,15 @@ def main():
         jewels_value = 0
         number_string = ''
 
-        for char in line:
+        endOfFile = False
 
-            if char == ' ' or char == '\n':
+        for i in range(len(line)):
+
+            # For catching the last item (i.e. end of file)
+            if i == len(line)-1:
+                number_string += line[i]
+
+            if line[i] == ' ' or line[i] == '\n' or i == len(line)-1:
                 number = int(number_string)
                 array += [number]
                 dp1 += [number]
@@ -24,7 +30,7 @@ def main():
                 number_string = ''
 
             else:
-                number_string += char
+                number_string += line[i]
 
         kings_daughter1 = maxSum(array, dp1, dp2)
         kings_daughter2 = jewels_value - kings_daughter1
